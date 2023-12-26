@@ -121,32 +121,3 @@ function PlayMusicFromCache(data)
         end)
     end
 end
-
--- If player is far away from music we will just delete it.
-CreateThread(function()
-    local ped = PlayerPedId()
-    local playerPos = GetEntityCoords(ped)
-    local destroyedMusicList = {}
-    while true do
-        Wait(500)
-        ped = PlayerPedId()
-        playerPos = GetEntityCoords(ped)
-        for k, v in pairs(soundInfo) do
-            if v.position ~= nil and v.isDynamic then
-                if #(v.position - playerPos) < (v.distance + config.distanceBeforeUpdatingPos) then
-                    if destroyedMusicList[v.id] then
-                        destroyedMusicList[v.id] = nil
-                        v.wasSilented = true
-                        PlayMusicFromCache(v)
-                    end
-                else
-                    if not destroyedMusicList[v.id] then
-                        destroyedMusicList[v.id] = true
-                        v.wasSilented = false
-                        DestroySilent(v.id)
-                    end
-                end
-            end
-        end
-    end
-end)
